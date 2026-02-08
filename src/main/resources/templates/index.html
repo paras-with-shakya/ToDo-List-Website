@@ -1,0 +1,162 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>To-Do List</title>
+
+<style>
+*{box-sizing:border-box}
+
+/* ===== Dark background ===== */
+body{
+  font-family:system-ui,Arial,sans-serif;
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:radial-gradient(circle at top,#1f2933,#05070b);
+  color:#e5e7eb;
+}
+
+/* ===== Floating card ===== */
+.container{
+  width:100%;
+  max-width:720px;
+  padding:20px;
+  border-radius:18px;
+  background:#0f172a;
+  box-shadow:0 0 30px rgba(56,189,248,.2);
+  animation:float 3s ease-in-out infinite;
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+
+h1{margin:8px 0 16px;color:#38bdf8}
+
+/* ===== Forms ===== */
+form, .todo{display:flex;gap:8px;align-items:center}
+
+input[type=text]{
+  flex:1;
+  padding:8px 10px;
+  border:none;
+  border-radius:8px;
+  background:#020617;
+  color:#fff;
+  box-shadow:inset 0 0 6px rgba(56,189,248,.4);
+}
+
+/* ===== Buttons ===== */
+button{
+  padding:8px 12px;
+  border:0;
+  border-radius:8px;
+  cursor:pointer;
+  background:#38bdf8;
+  color:#000;
+  transition:.3s;
+}
+
+button:hover{
+  transform:scale(1.08);
+  box-shadow:0 0 12px #38bdf8;
+}
+
+/* Delete button red */
+.todo form:last-child button{
+  background:#ef4444;
+  color:#fff;
+}
+
+.todo form:last-child button:hover{
+  box-shadow:0 0 12px #ef4444;
+}
+
+/* ===== Todo list ===== */
+.list{
+  margin-top:16px;
+  display:flex;
+  flex-direction:column;
+  gap:10px
+}
+
+.todo{
+  padding:10px;
+  border-radius:10px;
+  justify-content:space-between;
+  background:#020617;
+  box-shadow:0 0 10px rgba(56,189,248,.15);
+  animation:fadeIn .5s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.left{display:flex;gap:10px;align-items:center}
+
+.done{
+  opacity:.6;
+  text-decoration:line-through;
+  color:#64748b;
+}
+
+.bar{display:flex;gap:8px;margin-top:12px}
+
+small{color:#94a3b8}
+
+hr{border-color:#1e293b}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>✅ To-Do List</h1>
+
+<form method="post" action="/add">
+  <input type="text" name="title" placeholder="Add a new task..." required />
+  <button type="submit">Add</button>
+</form>
+
+<div class="bar">
+  <form method="post" action="/clear-completed">
+    <button type="submit">Clear Completed</button>
+  </form>
+
+  <small th:text="${todos != null ? #lists.size(todos) : 0} + ' item(s)'"></small>
+</div>
+
+<div class="list">
+  <div class="todo" th:each="t : ${todos}">
+    <div class="left">
+      <form th:action="@{'/toggle/' + ${t.id}}" method="post">
+        <button type="submit"
+                th:text="${t.completed} ? 'Undo' : 'Done'">
+        </button>
+      </form>
+
+      <span th:text="${t.title}"
+            th:classappend="${t.completed} ? ' done' : ''">
+      </span>
+    </div>
+
+    <form th:action="@{'/delete/' + ${t.id}}" method="post">
+      <button type="submit">Delete</button>
+    </form>
+  </div>
+</div>
+
+<hr />
+<p><small>Data is saved to <code>data/todos.json</code> (auto-created).</small></p>
+
+</div>
+</body>
+</html>
